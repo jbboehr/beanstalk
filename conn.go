@@ -53,6 +53,13 @@ func Dial(network, addr string) (*Conn, error) {
 
 func (c *Conn) UseTube(name string) error {
     c.Tube = Tube{c, name}
+    c.TubeSet = *NewTubeSet(c, name)
+    return nil
+}
+
+func (c *Conn) UseTubes(name ...string) error {
+    c.Tube = Tube{c, name[0]}
+    c.TubeSet = *NewTubeSet(c, name...)
     return nil
 }
 

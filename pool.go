@@ -35,7 +35,11 @@ type IConn interface {
     Kick(bound int) (n int, err error)
     Pause(d time.Duration) error
 
+    // Implemented in tubeset
+    Reserve(timeout time.Duration) (id uint64, body []byte, err error)
+
     UseTube(name string) error
+    UseTubes(name... string) error
 }
 
 type Pool struct {
