@@ -320,6 +320,15 @@ func (pc *pooledConnection) Pause(d time.Duration) error {
     return pc.c.Pause(d)
 }
 
+func (pc *pooledConnection) Reserve(timeout time.Duration) (id uint64, body []byte, err error) {
+    c, ok := pc.c.(*Conn)
+    if !ok {
+        return 0, nil, errors.New("pooledConnection conn cannot assert *Conn")
+    }
+
+    return c.TubeSet.Reserve(timeout)
+}
+
 func (pc *pooledConnection) UseTube(name string) error {
     c, ok := pc.c.(*Conn)
     if !ok {
@@ -327,6 +336,16 @@ func (pc *pooledConnection) UseTube(name string) error {
     }
 
     c.UseTube(name)
+    return nil
+}
+
+func (pc *pooledConnection) UseTubes(name... string) error {
+    c, ok := pc.c.(*Conn)
+    if !ok {
+        return errors.New("pooledConnection conn cannot assert *Conn")
+    }
+
+    c.UseTubes(name...)
     return nil
 }
 
@@ -347,4 +366,6 @@ func (ec errorConnection) PeekDelayed() (id uint64, body []byte, err error) {ret
 func (ec errorConnection) PeekBuried() (id uint64, body []byte, err error) {return 0, nil, ec.err}
 func (ec errorConnection) Kick(bound int) (n int, err error) {return 0, ec.err}
 func (ec errorConnection) Pause(d time.Duration) error {return ec.err}
+func (ec errorConnection) Reserve(timeout time.Duration) (id uint64, body []byte, err error) {return 0, nil, ec.err}
 func (ec errorConnection) UseTube(name string) error {return ec.err}
+func (ec errorConnection) UseTubes(name... string) error {return ec.err}
